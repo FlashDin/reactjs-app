@@ -59,7 +59,19 @@ class Post extends Component {
                 let arr = [];
                 let totalPg = Math.ceil(json.length / this.state._limit);
                 for (let i = 0; i < totalPg; i++) {
-                    arr.push(<a href={"?_page=" + (i + 1) + "&_limit=" + this.state._limit}
+                    arr.push(<a href={"?_page=" + (i + 1) + "&_limit=" + this.state._limit + '&q=' + this.state.keyword}
+                                key={i}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    let uri = new URL(e.target.href);
+                                    window.history.pushState('', '', uri.search);
+                                    this.setState({
+                                        _page: uri.searchParams.get('_page')
+                                    }, () => {
+                                        this.getDataAllData();
+                                        this.getData();
+                                    });
+                                }}
                                 className={this.state._page.toString() === (i + 1).toString() ? 'active' : ''}>{i + 1}</a>);
                 }
                 this.setState({pageNum: arr});
@@ -143,9 +155,13 @@ class Post extends Component {
                                }}
                                placeholder="Pencarian..."/>
                         <button onClick={() => {
-                            window.history.pushState('', '', '?_page=' + this.state._page + '&_limit=' + this.state._limit + '?q=' + this.state.keyword);
-                            this.getDataAllData();
-                            this.getData();
+                            this.setState({
+                                _page: 1
+                            }, () => {
+                                window.history.pushState('', '', '?_page=' + this.state._page + '&_limit=' + this.state._limit + '&q=' + this.state.keyword);
+                                this.getDataAllData();
+                                this.getData();
+                            })
                         }}>Cari
                         </button>
                     </th>
@@ -187,9 +203,31 @@ class Post extends Component {
             </table>
             <br/>
             <div className="pagination">
-                <a href={'?_page=' + (parseInt(this.state._page) - 1) + '&_limit=' + this.state._limit + '?q=' + this.state.keyword}>&laquo;</a>
+                <a href={'?_page=' + (parseInt(this.state._page) - 1) + '&_limit=' + this.state._limit + '&q=' + this.state.keyword}
+                   onClick={(e) => {
+                       e.preventDefault();
+                       let uri = new URL(e.target.href);
+                       window.history.pushState('', '', uri.search);
+                       this.setState({
+                           _page: uri.searchParams.get('_page')
+                       }, () => {
+                           this.getDataAllData();
+                           this.getData();
+                       });
+                   }}>&laquo;</a>
                 {this.state.pageNum.map((v) => v)}
-                <a href={'?_page=' + (parseInt(this.state._page) + 1) + '&_limit=' + this.state._limit + '?q=' + this.state.keyword}>&raquo;</a>
+                <a href={'?_page=' + (parseInt(this.state._page) + 1) + '&_limit=' + this.state._limit + '&q=' + this.state.keyword}
+                   onClick={(e) => {
+                       e.preventDefault();
+                       let uri = new URL(e.target.href);
+                       window.history.pushState('', '', uri.search);
+                       this.setState({
+                           _page: uri.searchParams.get('_page')
+                       }, () => {
+                           this.getDataAllData();
+                           this.getData();
+                       });
+                   }}>&raquo;</a>
             </div>
             <Snackbar openSnackbar={this.state.openSnackbar} message={this.state.snackbarMessage}/>
             <Modal1 handleOpen={this.state.modalShow}
