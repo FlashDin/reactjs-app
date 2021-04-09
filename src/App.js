@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import './App.css';
 import Home from './Home';
 import Post from './Post';
+import Test from "./Test";
 
 class App extends Component {
 
     components = {
         '': Home,
         home: Home,
+        test: Test,
         post: Post
     };
 
