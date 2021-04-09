@@ -16,6 +16,12 @@ class Home extends Component {
                 >
                     To Post
                 </a>
+                <a
+                    className="App-link"
+                    onClick={(e) => this.props.popState(e, '', 'Test', 'test')}
+                >
+                    Test
+                </a>
             </header>
         </React.Fragment>);
     }

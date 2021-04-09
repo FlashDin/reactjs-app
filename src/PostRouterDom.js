@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import Snackbar from './snackbar';
 import {Modal1} from './modal';
-import PostForm from "./form/PostForm";
+import PostRouterDomForm from "./form/PostRouterDomForm";
 
-class Post extends Component {
+class PostRouterDom extends Component {
 
     initState = {
         posts: [],
@@ -13,10 +13,6 @@ class Post extends Component {
         modalFooter: null,
         openSnackbar: false,
         snackbarMessage: '',
-        _page: 1,
-        _limit: 10,
-        pageNum: [],
-        keyword: ''
     };
 
     constructor(props) {
@@ -24,50 +20,12 @@ class Post extends Component {
         this.state = this.initState;
     }
 
-    componentWillMount() {
-        this.setState({
-            _page: this.getParamPage() === null ? 1 : this.getParamPage(),
-            _limit: this.getParamLimit() === null ? 10 : this.getParamLimit()
-        });
-    }
-
     componentDidMount() {
-        this.getDataAllData();
         this.getData();
     }
 
-    getParams() {
-        let url_string = window.location.href;
-        let url = new URL(url_string);
-        return url
-    }
-
-    getParamPage = () => {
-        return this.getParams().searchParams.get("_page");
-    };
-
-    getParamLimit = () => {
-        return this.getParams().searchParams.get("_limit");
-    };
-
-    getDataAllData = () => {
-        fetch('http://localhost:3002/posts?q=' + this.state.keyword, {
-            method: 'GET'
-        })
-            .then(res => res.json())
-            .then(json => {
-                let arr = [];
-                let totalPg = Math.ceil(json.length / this.state._limit);
-                for (let i = 0; i < totalPg; i++) {
-                    arr.push(<a href={"?_page=" + (i + 1) + "&_limit=" + this.state._limit}
-                                className={this.state._page.toString() === (i + 1).toString() ? 'active' : ''}>{i + 1}</a>);
-                }
-                this.setState({pageNum: arr});
-            });
-    };
-
     getData = () => {
-        fetch('http://localhost:3002/posts?_page=' + this.state._page + '&_limit=' + this.state._limit + '&q=' + this.state.keyword, {
+        fetch('http://localhost:3002/posts', {
             method: 'GET'
         })
             .then(res => res.json())
@@ -99,12 +57,8 @@ class Post extends Component {
         }));
     };
 
-    handleInputChange = (val, name) => {
-        this.setState({[name]: val});
-    };
-
     render() {
-        return (<div style={{margin: 30}}>
+        return (<React.Fragment>
             <table style={{
                 overflowX: "auto"
             }}>
@@ -115,7 +69,7 @@ class Post extends Component {
                             this.setState({
                                 modalShow: true,
                                 modalHeader: 'Add Post',
-                                modalContent: <PostForm
+                                modalContent: <PostRouterDomForm
                                     data={{
                                         userId: 1,
                                         id: '',
@@ -134,23 +88,6 @@ class Post extends Component {
                     <th></th>
                 </tr>
                 <tr>
-                    <th colSpan={3}>
-                        <input className="square-input-field"
-                               name="keyword"
-                               type="text"
-                               onChange={(e) => {
-                                   this.handleInputChange(e.target.value, e.target.name)
-                               }}
-                               placeholder="Pencarian..."/>
-                        <button onClick={() => {
-                            window.history.pushState('', '', '?_page=' + this.state._page + '&_limit=' + this.state._limit + '?q=' + this.state.keyword);
-                            this.getDataAllData();
-                            this.getData();
-                        }}>Cari
-                        </button>
-                    </th>
-                </tr>
-                <tr>
                     <th>Title</th>
                     <th>Body</th>
                     <th>Action</th>
@@ -161,12 +98,12 @@ class Post extends Component {
                     <tr key={i}>
                         <td>{v.title}</td>
                         <td>{v.body}</td>
-                        <td style={{display: 'inline-flex'}}>
+                        <td>
                             <button onClick={() => {
                                 this.setState({
                                     modalShow: true,
                                     modalHeader: 'Update Post',
-                                    modalContent: <PostForm
+                                    modalContent: <PostRouterDomForm
                                         data={v}
                                         toastNotif={this.toastNotif.bind(this)}
                                         modalShow={this.handleBooleanState.bind(this)}
@@ -184,13 +121,19 @@ class Post extends Component {
                     </tr>
                 ))}
                 </tbody>
+                <tfoot>
+                <div className="pagination">
+                    <a href="#">&laquo;</a>
+                    <a href="#">1</a>
+                    <a href="#" className="active">2</a>
+                    <a href="#">3</a>
+                    <a href="#">4</a>
+                    <a href="#">5</a>
+                    <a href="#">6</a>
+                    <a href="#">&raquo;</a>
+                </div>
+                </tfoot>
             </table>
-            <br/>
-            <div className="pagination">
-                <a href={'?_page=' + (parseInt(this.state._page) - 1) + '&_limit=' + this.state._limit + '?q=' + this.state.keyword}>&laquo;</a>
-                {this.state.pageNum.map((v) => v)}
-                <a href={'?_page=' + (parseInt(this.state._page) + 1) + '&_limit=' + this.state._limit + '?q=' + this.state.keyword}>&raquo;</a>
-            </div>
             <Snackbar openSnackbar={this.state.openSnackbar} message={this.state.snackbarMessage}/>
             <Modal1 handleOpen={this.state.modalShow}
                     width={this.state.modalHeader === 'Hapus Konten' ? '30%' : '95%'}
@@ -207,8 +150,8 @@ class Post extends Component {
                         this.state.modalFooter
                     }
             />
-        </div>);
+        </React.Fragment>);
     }
 }
 
-export default Post;
+export default PostRouterDom;
